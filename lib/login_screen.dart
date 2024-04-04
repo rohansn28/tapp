@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tapp/utils/validators.dart';
 import 'package:tapp/utils/web.dart';
 import 'package:tapp/controllers/local_store.dart';
+import 'package:tapp/variables/local_variables.dart';
 
 final formkey = GlobalKey<FormState>();
 
@@ -13,12 +15,6 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  @override
-  void initState() {
-    super.initState();
-    initPrefs(context);
-  }
-
   final TextEditingController emailController = TextEditingController();
 
   final TextEditingController passwordController = TextEditingController();
@@ -64,15 +60,18 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               SizedBox(height: 24),
               ElevatedButton(
-                onPressed: () {
-                  // Perform login logic here
-                  // String email = emailController.text;
-                  // String password = passwordController.text;
-                  // You can add validation and backend logic here
+                onPressed: () async {
                   formkey.currentState!.validate();
                   login(emailController.text, passwordController.text);
+                  SharedPreferences prefs =
+                      await SharedPreferences.getInstance();
+                  String? token = prefs.getString(tokenLabel);
+                  print(token);
+                  if (token != null) {
+                    Navigator.pushNamed(context, '/gamehome');
+                  }
                 },
-                child: Text(
+                child: const Text(
                   'Login',
                   style: TextStyle(color: Colors.green),
                 ),

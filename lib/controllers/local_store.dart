@@ -11,45 +11,6 @@ void initPrefs(context) async {
     gameCoins = prefs.getInt(gameCoinsLabel)!;
     deviceId = prefs.getString(deviceIdLabel)!;
     late DateTime lastCompletion;
-    if (gameCoins < 12000) {
-      phase = prefs.getInt('phase1')!;
-    }
-    if (gameCoins >= 12000 && gameCoins < 15000) {
-      lastCompletion = DateTime.fromMillisecondsSinceEpoch(
-          prefs.getInt('12000Coin-Completiontime') ?? 0);
-
-      DateTime now = DateTime.now();
-      Duration difference = now.difference(lastCompletion);
-      if (difference.inHours >= 24) {
-        phase = prefs.getInt('phase2')!;
-      } else {
-        phase = prefs.getInt('phase1')!;
-      }
-    }
-    if (gameCoins >= 15000 && gameCoins < 18000) {
-      lastCompletion = DateTime.fromMillisecondsSinceEpoch(
-          prefs.getInt('15000Coin-Completiontime') ?? 0);
-
-      DateTime now = DateTime.now();
-      Duration difference = now.difference(lastCompletion);
-      if (difference.inHours >= 24) {
-        phase = prefs.getInt('phase3')!;
-      } else {
-        phase = prefs.getInt('phase2')!;
-      }
-    }
-    if (gameCoins >= 18000 && gameCoins < 20000) {
-      lastCompletion = DateTime.fromMillisecondsSinceEpoch(
-          prefs.getInt('18000Coin-Completiontime') ?? 0);
-
-      DateTime now = DateTime.now();
-      Duration difference = now.difference(lastCompletion);
-      if (difference.inHours >= 24) {
-        phase = prefs.getInt('phase4')!;
-      } else {
-        phase = prefs.getInt('phase3')!;
-      }
-    }
   } else {
     prefs.setString(deviceIdLabel, const Uuid().v4());
     deviceId = prefs.getString(deviceIdLabel)!;
@@ -57,16 +18,12 @@ void initPrefs(context) async {
     // sendDeviceIdToBackend(deviceId, gameCoins.toString());
 
     prefs.setInt(gameCoinsLabel, 0);
-    prefs.setInt('phase1', 12000);
-    prefs.setInt('phase2', 15000);
-    prefs.setInt('phase3', 18000);
-    prefs.setInt('phase4', 20000);
 
     gameCoins = 0;
-    phase = prefs.getInt('phase1')!;
+
     // prefs.getKeys();
   }
-  Navigator.popAndPushNamed(context, "/gamehome");
+  Navigator.popAndPushNamed(context, "/login");
 }
 
 Future<int> increaseGameCoin(int value) async {

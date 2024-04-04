@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tapp/bonus_screen.dart';
 import 'package:tapp/click_screen.dart';
 import 'package:tapp/game_home.dart';
@@ -9,6 +10,7 @@ import 'package:tapp/resumetracking_screen.dart';
 import 'package:tapp/startpage.dart';
 import 'package:tapp/task_line_screen.dart';
 import 'package:tapp/utils/web.dart';
+import 'package:tapp/variables/local_variables.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -46,10 +48,11 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
+      home: AuthenticationWrapper(),
       routes: {
         "/gamehome": (context) => const GameHome(),
         // "/": (context) => const StartPg(),
-        "/": (context) => LoginScreen(),
+        "/login": (context) => LoginScreen(),
         "/register": (context) => RegisterScreen(),
         "/click": (context) => const ClickScreen(),
         "/task": (context) => const TaskLineScreen(),
@@ -59,6 +62,32 @@ class MyApp extends StatelessWidget {
         "/tracking": (context) => const ResumeTrackingScreen(),
       },
     );
+  }
+}
+
+class AuthenticationWrapper extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder(
+      future: checkIfLoggedIn(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return CircularProgressIndicator();
+        } else {
+          if (snapshot.data == true) {
+            return const GameHome();
+          } else {
+            return LoginScreen();
+          }
+        }
+      },
+    );
+  }
+
+  Future<bool> checkIfLoggedIn() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString(tokenLabel);
+    return token != null;
   }
 }
 

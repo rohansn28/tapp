@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tapp/model/applink.dart';
 import 'package:tapp/variables/local_variables.dart';
 import 'package:tapp/variables/modal_variable.dart';
@@ -139,9 +140,12 @@ Future<void> login(String email, String password) async {
 
   if (response.statusCode == 200) {
     print(response.data);
-    print('Login Successful');
-  } else {
-    print('failed');
+    print(response.data['token']);
+    // var responseData = json.decode(response.data);
+    String token = response.data['token'];
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString(tokenLabel, token);
   }
 }
 

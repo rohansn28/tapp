@@ -11,6 +11,7 @@ bool objLive = false;
 ///for prefs
 String gameCoinsLabel = "gameCoins";
 String deviceIdLabel = "deviceId";
+String tokenLabel = "token";
 
 ///for globally using
 String deviceId = '';
