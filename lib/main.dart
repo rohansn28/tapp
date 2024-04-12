@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:tapp/bonus_screen.dart';
+
 import 'package:tapp/click_screen.dart';
 import 'package:tapp/game_home.dart';
 import 'package:tapp/login_screen.dart';
 import 'package:tapp/profile_screen.dart';
 import 'package:tapp/register_screen.dart';
 import 'package:tapp/resumetracking_screen.dart';
-import 'package:tapp/startpage.dart';
 import 'package:tapp/task_line_screen.dart';
+
 import 'package:tapp/utils/web.dart';
 import 'package:tapp/variables/local_variables.dart';
 
@@ -31,7 +31,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     // fetchData();
     return MaterialApp(
-      title: 'Taskline',
+      title: 'TApp',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         scaffoldBackgroundColor: const Color.fromARGB(255, 98, 42, 71),
@@ -48,17 +48,16 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-      home: AuthenticationWrapper(),
+      home: const AuthenticationWrapper(),
       routes: {
         "/gamehome": (context) => const GameHome(),
-        // "/": (context) => const StartPg(),
         "/login": (context) => LoginScreen(),
         "/register": (context) => RegisterScreen(),
         "/click": (context) => const ClickScreen(),
         "/task": (context) => const TaskLineScreen(),
         "/profile": (context) => const ProfileScreen(),
         // "/startpg": (context) => const StartPg(),
-        "/bonus": (context) => const BounsScreen(),
+
         "/tracking": (context) => const ResumeTrackingScreen(),
       },
     );
@@ -66,6 +65,8 @@ class MyApp extends StatelessWidget {
 }
 
 class AuthenticationWrapper extends StatelessWidget {
+  const AuthenticationWrapper({super.key});
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(

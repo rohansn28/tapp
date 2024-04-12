@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tapp/model/applink.dart';
@@ -42,15 +41,6 @@ Future<List<Applink>> fetchGameData(String endpoint) async {
   List<Applink> applinks = applinkFromJson(response.body);
 
   return applinks;
-}
-
-Future fetchLeaderboardData(String endpoint) async {
-  var url = Uri.parse("$baseUrl$basePostFix$endpoint");
-
-  var response = await http.get(url);
-  var data = jsonDecode(response.body);
-
-  return data;
 }
 
 Future<String> fetchButtonLinks(String endpoint) async {
@@ -149,4 +139,25 @@ Future<void> login(String email, String password) async {
   }
 }
 
-Future<void> register(String email, String password, String mobile) async {}
+Future<void> register(
+    String email, String password, String mobile, String name) async {
+  const url = 'http://10.0.2.2:8000/api/register';
+  final dio = Dio();
+
+  final response = await dio.post(url, data: {
+    'name': name,
+    'email': email,
+    'mobile': mobile,
+    'password': password,
+  });
+
+  if (response.statusCode == 200) {
+    print(response.data);
+
+    // var responseData = json.decode(response.data);
+    String token = response.data['token'];
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString(tokenLabel, token);
+  }
+}

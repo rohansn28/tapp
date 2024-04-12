@@ -10,7 +10,7 @@ void initPrefs(context) async {
   if (prefs.containsKey(gameCoinsLabel)) {
     gameCoins = prefs.getInt(gameCoinsLabel)!;
     deviceId = prefs.getString(deviceIdLabel)!;
-    late DateTime lastCompletion;
+    // late DateTime lastCompletion;
   } else {
     prefs.setString(deviceIdLabel, const Uuid().v4());
     deviceId = prefs.getString(deviceIdLabel)!;

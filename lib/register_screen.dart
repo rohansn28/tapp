@@ -4,6 +4,7 @@ import 'package:tapp/utils/validators.dart';
 
 class RegisterScreen extends StatelessWidget {
   RegisterScreen({super.key});
+  final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController mobileController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
@@ -22,6 +23,15 @@ class RegisterScreen extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              TextFormField(
+                style: const TextStyle(color: Colors.white),
+                controller: nameController,
+                decoration: const InputDecoration(
+                  labelText: 'Name',
+                  labelStyle: TextStyle(color: Colors.white),
+                  errorStyle: TextStyle(color: Colors.white),
+                ),
+              ),
               TextFormField(
                 style: const TextStyle(color: Colors.white),
                 keyboardType: TextInputType.emailAddress,

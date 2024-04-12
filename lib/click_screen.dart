@@ -38,11 +38,6 @@ class _ClickScreenState extends State<ClickScreen> {
                 builder: (context) => const GameHome(),
               ),
             );
-            if (gameCoins >= phase && phase != 0) {
-              _prefs = await SharedPreferences.getInstance();
-              _prefs.setInt('${phase}Coin-Completiontime',
-                  DateTime.now().millisecondsSinceEpoch);
-            }
           },
         ),
         title: const Text('CLICK'),

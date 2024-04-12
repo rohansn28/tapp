@@ -58,7 +58,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 validator: ValidatorCheck.isPasswordValid,
                 autovalidateMode: AutovalidateMode.onUserInteraction,
               ),
-              SizedBox(height: 24),
+              const SizedBox(height: 24),
               ElevatedButton(
                 onPressed: () async {
                   formkey.currentState!.validate();
