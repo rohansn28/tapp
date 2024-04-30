@@ -75,36 +75,37 @@ class _ClickScreenState extends State<ClickScreen> {
                 const SizedBox(
                   height: 20,
                 ),
-                Expanded(
-                  child: FutureBuilder<List<Applink>>(
-                    future: fetchPlayData('playlinks'),
-                    builder: (context, snapshot) {
-                      if (snapshot.hasData) {
-                        return ListView.builder(
-                          itemCount: snapshot.data!.length,
-                          itemBuilder: (context, index) {
-                            return commontask(
-                              btnText: "CLICK ${index + 1}",
-                              stayTime: "40",
-                              winCoin: "160",
-                              url: snapshot.data![index].link,
-                              index: index,
-                            );
-                          },
-                        );
-                      } else if (snapshot.hasError) {
-                        return Text('${snapshot.error}');
-                      }
+                // Expanded(
+                //   child: FutureBuilder<List<Applink>>(
+                //     future: fetchPlayData('playlinks'),
+                //     builder: (context, snapshot) {
+                //       if (snapshot.hasData) {
+                //         return ListView.builder(
+                //           itemCount: snapshot.data!.length,
+                //           itemBuilder: (context, index) {
+                //             return commontask(
+                //               btnText: "CLICK ${index + 1}",
+                //               stayTime: "40",
+                //               winCoin: "160",
+                //               url: snapshot.data![index].link,
+                //               index: index,
+                //               uid: '',
+                //             );
+                //           },
+                //         );
+                //       } else if (snapshot.hasError) {
+                //         return Text('${snapshot.error}');
+                //       }
 
-                      return const Center(
-                        child: Text(
-                          'Loading...',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      );
-                    },
-                  ),
-                ),
+                //       return const Center(
+                //         child: Text(
+                //           'Loading...',
+                //           style: TextStyle(color: Colors.white),
+                //         ),
+                //       );
+                //     },
+                //   ),
+                // ),
               ],
             ),
           ),

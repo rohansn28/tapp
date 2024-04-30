@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:tapp/game_home.dart';
 import 'package:tapp/model/applink.dart';
+import 'package:tapp/model/task.dart';
 import 'package:tapp/utils/web.dart';
-import 'package:tapp/variables/local_variables.dart';
+
 import 'package:tapp/variables/modal_variable.dart';
 import 'package:tapp/widgets/commonmincoinbar.dart';
 import 'package:tapp/widgets/commontask.dart';
@@ -17,22 +18,26 @@ class TaskScreen extends StatefulWidget {
 }
 
 class _TaskScreenState extends State<TaskScreen> {
-  late SharedPreferences _prefs;
-  Future<void> _refreshData() async {
-    // Fetch updated data from shared preferences
+  late SharedPreferences prefs;
+  late String uid;
 
-    int updatedCoins = await SharedPreferences.getInstance().then((prefs) {
-      return prefs.getInt(gameCoinsLabel) ?? 0;
-    });
-
-    // Update UI
+  void initPrefs() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
-      gameCoins = updatedCoins;
+      uid = prefs.getString('uId')!;
     });
   }
 
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    initPrefs();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    mainTasks();
     return Scaffold(
       appBar: AppBar(
         leading: InkWell(
@@ -45,11 +50,6 @@ class _TaskScreenState extends State<TaskScreen> {
                 builder: (context) => const GameHome(),
               ),
             );
-            if (gameCoins >= phase && phase != 0) {
-              _prefs = await SharedPreferences.getInstance();
-              _prefs.setInt('${phase}Coin-Completiontime',
-                  DateTime.now().millisecondsSinceEpoch);
-            }
           },
         ),
         title: const Text('TASK'),
@@ -82,19 +82,19 @@ class _TaskScreenState extends State<TaskScreen> {
                   height: 20,
                 ),
                 Expanded(
-                  child: FutureBuilder<List<Applink>>(
-                    future: fetchTasklineData('tasklinelinks'),
+                  child: FutureBuilder<List<Task>>(
+                    future: mainTasks(),
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
                         return ListView.builder(
                           itemCount: snapshot.data!.length,
                           itemBuilder: (context, index) {
                             return commontask(
-                              btnText: "TASK ${index + 1}",
-                              stayTime: "50",
-                              winCoin: "300",
-                              url: snapshot.data![index].link,
-                              index: index,
+                              taskname: snapshot.data![index].taskname,
+                              taskdesc: snapshot.data![index].taskdesc,
+                              taskinst: snapshot.data![index].taskinst,
+                              uid: uid,
+                              index: snapshot.data![index].id,
                             );
                           },
                         );

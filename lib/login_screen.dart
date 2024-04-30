@@ -1,20 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tapp/register_screen.dart';
 import 'package:tapp/utils/validators.dart';
 import 'package:tapp/utils/web.dart';
 import 'package:tapp/controllers/local_store.dart';
 import 'package:tapp/variables/local_variables.dart';
 
-final formkey = GlobalKey<FormState>();
-
 class LoginScreen extends StatefulWidget {
-  LoginScreen({super.key});
+  const LoginScreen({super.key});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  @override
+  void initState() {
+    super.initState();
+    initPrefs(context);
+  }
+
+  final formkey = GlobalKey<FormState>();
   final TextEditingController emailController = TextEditingController();
 
   final TextEditingController passwordController = TextEditingController();
@@ -60,22 +66,50 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(height: 24),
               ElevatedButton(
-                onPressed: () async {
-                  formkey.currentState!.validate();
-                  login(emailController.text, passwordController.text);
-                  SharedPreferences prefs =
-                      await SharedPreferences.getInstance();
-                  String? token = prefs.getString(tokenLabel);
-                  print(token);
-                  if (token != null) {
-                    Navigator.pushNamed(context, '/gamehome');
+                onPressed: () {
+                  if (formkey.currentState!.validate()) {
+                    login(
+                      context,
+                      emailController.text,
+                      passwordController.text,
+                    );
                   }
+                  // SharedPreferences prefs =
+                  //     await SharedPreferences.getInstance();
+                  // String? token = prefs.getString(tokenLabel);
+                  // print(token);
+                  // if (token != null) {
+                  //   Navigator.pushNamed(context, '/gamehome');
+                  // }
                 },
                 child: const Text(
                   'Login',
                   style: TextStyle(color: Colors.green),
                 ),
               ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  const Text(
+                    "Don't have an account",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pushReplacement(
+                        MaterialPageRoute(
+                          builder: (context) => const RegisterScreen(),
+                        ),
+                      );
+                    },
+                    child: const Text(
+                      'Create Account',
+                      style: TextStyle(color: Colors.green),
+                    ),
+                  ),
+                ],
+              )
             ],
           ),
         ),

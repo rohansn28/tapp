@@ -7,7 +7,8 @@ import 'package:tapp/login_screen.dart';
 import 'package:tapp/profile_screen.dart';
 import 'package:tapp/register_screen.dart';
 import 'package:tapp/resumetracking_screen.dart';
-import 'package:tapp/task_line_screen.dart';
+
+import 'package:tapp/task_screen.dart';
 
 import 'package:tapp/utils/web.dart';
 import 'package:tapp/variables/local_variables.dart';
@@ -54,7 +55,7 @@ class MyApp extends StatelessWidget {
         "/login": (context) => LoginScreen(),
         "/register": (context) => RegisterScreen(),
         "/click": (context) => const ClickScreen(),
-        "/task": (context) => const TaskLineScreen(),
+        "/task": (context) => const TaskScreen(),
         "/profile": (context) => const ProfileScreen(),
         // "/startpg": (context) => const StartPg(),
 

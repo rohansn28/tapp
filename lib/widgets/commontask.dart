@@ -1,22 +1,27 @@
 import 'dart:async';
-import 'package:flutter/material.dart';
+import 'dart:io';
 
+import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:tapp/widgets/commonadmarkbottom.dart';
+
+import 'package:tapp/task_screen.dart';
 
 class commontask extends StatefulWidget {
-  final String btnText;
-  final String stayTime;
-  final String winCoin;
-  final String url;
+  final String taskname;
+  final String taskdesc;
+  final String taskinst;
+
+  final String uid;
   final int index;
   const commontask({
     super.key,
-    required this.btnText,
-    required this.stayTime,
-    required this.winCoin,
-    required this.url,
     required this.index,
+    required this.uid,
+    required this.taskname,
+    required this.taskdesc,
+    required this.taskinst,
   });
 
   @override
@@ -24,126 +29,169 @@ class commontask extends StatefulWidget {
 }
 
 class _commontaskState extends State<commontask> {
-  late SharedPreferences _prefs;
-  late DateTime _lastCompletion;
+  bool isTaskCompleted = false;
+  final formkey = GlobalKey<FormState>();
+  XFile? _image;
 
-  @override
-  void initState() {
-    super.initState();
-    _initializeSharedPreferences();
+  Future<void> _pickImage(ImageSource source) async {
+    final picker = ImagePicker();
+    final pickedImage = await picker.pickImage(source: source);
+    setState(() {
+      _image = pickedImage;
+    });
   }
 
-  Future<void> _initializeSharedPreferences() async {
-    _prefs = await SharedPreferences.getInstance();
+  Future<void> submitTask(
+    String userId,
+    String tName,
+    String tDesc,
+    String tInstruction,
+  ) async {
+    const url = 'http://10.0.2.2:8000/api/submit-task';
 
-    _lastCompletion = DateTime.fromMillisecondsSinceEpoch(_prefs.getInt(
-            'lastCompletion ${widget.btnText + widget.index.toString()}') ??
-        0);
-  }
+    var request = http.MultipartRequest('POST', Uri.parse(url));
 
-  bool _canPerformTask() {
-    DateTime now = DateTime.now();
-    Duration difference = now.difference(_lastCompletion);
+    request.fields['tname'] = tName;
+    request.fields['tdesc'] = tDesc;
+    request.fields['tinst'] = tInstruction;
+    request.fields['user_id'] = userId;
 
-    return difference.inHours >= 24;
-  }
-
-  void _performTask() {
-    if (_canPerformTask()) {
-      Navigator.pushNamed(context, '/tracking', arguments: {
-        "link": widget.url,
-        "coin": widget.winCoin,
-        "seconds": widget.stayTime,
-        "type": "task",
-        "id": widget.index.toString(),
-        "taskname":
-            'lastCompletion ${widget.btnText + widget.index.toString()}',
-      });
-    } else {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text(textAlign: TextAlign.center, 'Task Locked'),
-            content: const Text(
-                textAlign: TextAlign.center,
-                'You can perform this task again in 24 hours.'),
-            actions: <Widget>[
-              Center(
-                child: TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text('OK'),
-                ),
-              ),
-            ],
-          );
-        },
+    if (_image != null) {
+      request.files.add(
+        await http.MultipartFile.fromPath(
+          'image',
+          _image!.path,
+        ),
       );
+    }
+
+    try {
+      print(request.fields);
+      final streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
+      print(response.body);
+
+      if (response.statusCode == 200) {
+        print('ye kaam kr rha h kya?');
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setBool('task ${widget.index} completed', true);
+        print(response.body);
+      } else {
+        print('Failed to submit task: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error submitting task: $e');
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 16.0),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-        height: 110,
-        width: MediaQuery.of(context).size.width * 0.8,
-        decoration: const BoxDecoration(
-          color: Colors.white,
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Stack(
-              children: [
-                InkWell(
-                  onTap: () {
-                    _performTask();
-                  },
-                  child: Container(
-                    height: 50,
-                    width: MediaQuery.of(context).size.width * 0.5,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(28),
-                      color: Colors.green,
-                      border: Border.all(color: Colors.black),
-                    ),
-                    child: Center(
-                      child: Text(
-                        widget.btnText,
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w900,
-                          fontSize: 32,
+    return isTaskCompleted
+        ? const SizedBox()
+        : Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16.0),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              // height: 110,
+              width: MediaQuery.of(context).size.width * 0.8,
+              decoration: const BoxDecoration(
+                color: Colors.white,
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Form(
+                    key: formkey,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        TextFormField(
+                          maxLines: null,
+                          initialValue: widget.taskname, //taskData['taskName'],
+                          decoration: InputDecoration(labelText: 'Task Name'),
+                          readOnly: true,
                         ),
-                      ),
+                        TextFormField(
+                          initialValue: widget.taskdesc, //taskData['taskName'],
+                          decoration:
+                              InputDecoration(labelText: 'Task Description'),
+                          maxLines: null,
+                          readOnly: true,
+                        ),
+                        TextFormField(
+                          initialValue: widget.taskinst, //taskData['taskName'],
+                          decoration:
+                              InputDecoration(labelText: 'Task Instruction'),
+                          readOnly: true,
+                          maxLines: null,
+                        ),
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            _image == null
+                                ? Text('No image selected.')
+                                : Image.file(File(_image!.path)),
+                            ElevatedButton(
+                              onPressed: () => _pickImage(ImageSource.gallery),
+                              child: Text('Pick Image from Gallery'),
+                            ),
+                          ],
+                        ),
+                        ElevatedButton(
+                          onPressed: () async {
+                            submitTask(
+                              widget.uid,
+                              widget.taskname,
+                              widget.taskdesc,
+                              widget.taskinst,
+                            );
+
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: const Text(
+                                    textAlign: TextAlign.center,
+                                    'Task Submitted',
+                                  ),
+                                  content: const Text(
+                                      textAlign: TextAlign.center,
+                                      'You can perform this task again in 24 hours.'),
+                                  actions: <Widget>[
+                                    Center(
+                                      child: TextButton(
+                                        onPressed: () {
+                                          setState(() {
+                                            isTaskCompleted = true;
+                                          });
+                                          Navigator.pop(context);
+                                          Navigator.pushReplacement(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  const TaskScreen(),
+                                            ),
+                                          );
+                                        },
+                                        child: const Text('OK'),
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          },
+                          child: const Text(
+                            'Submit',
+                            style: TextStyle(color: Colors.green),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ),
-                const AdMarkBottom(),
-              ],
-            ),
-            const SizedBox(
-              height: 8,
-            ),
-            Text(
-              widget.btnText.contains('TASK')
-                  ? "Visit task for ${widget.stayTime} Seconds to win ${widget.winCoin} coins"
-                  : "Play game ${widget.stayTime} Seconds to win ${widget.winCoin} coins",
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 14,
+                ],
               ),
             ),
-          ],
-        ),
-      ),
-    );
+          );
   }
 }

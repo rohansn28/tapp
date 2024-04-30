@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tapp/pendingtask_screen.dart';
 import 'package:tapp/utils/web.dart';
 import 'package:tapp/variables/local_variables.dart';
 import 'package:tapp/variables/modal_variable.dart';
@@ -71,6 +72,11 @@ class _GameHomeState extends State<GameHome> {
                 const SizedBox(
                   height: 16.0,
                 ),
+                ElevatedButton(
+                    onPressed: () {
+                      logout(context);
+                    },
+                    child: const Text('Logout')),
                 const SizedBox(
                   height: 8,
                 ),
@@ -94,7 +100,7 @@ class _GameHomeState extends State<GameHome> {
                   children: [
                     CommonBoxNew(
                       text: 'NOTIFIC \n ATIONS',
-                      route: '/bonus',
+                      route: '/profile',
                       fontSize: 25.0,
                     ),
                     CommonBoxNew(
@@ -104,21 +110,55 @@ class _GameHomeState extends State<GameHome> {
                     ),
                   ],
                 ),
-                const Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    CommonBoxNew(
-                      text: 'LOGIN',
-                      route: '/login',
-                      fontSize: 25.0,
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => PendingTaskScreen(),
+                      ));
+                    },
+                    child: Card(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20.0),
+                      ),
+                      shadowColor: const Color.fromARGB(255, 7, 28, 255),
+                      elevation: 10.0,
+                      color: Colors.green,
+                      child: SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.7,
+                        height: MediaQuery.of(context).size.height * 0.1,
+                        child: const Center(
+                          child: Text(
+                            'Pending Tasks',
+                            // style: Theme.of(context).textTheme.headlineLarge,
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 30.0,
+                              fontWeight: FontWeight.w900,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
                     ),
-                    CommonBoxNew(
-                      text: 'Register',
-                      route: '/register',
-                      fontSize: 25.0,
-                    ),
-                  ],
+                  ),
                 ),
+                // const Row(
+                //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                //   children: [
+                //     CommonBoxNew(
+                //       text: 'LOGIN',
+                //       route: '/login',
+                //       fontSize: 25.0,
+                //     ),
+                //     CommonBoxNew(
+                //       text: 'Register',
+                //       route: '/register',
+                //       fontSize: 25.0,
+                //     ),
+                //   ],
+                // ),
               ],
             ),
           ),

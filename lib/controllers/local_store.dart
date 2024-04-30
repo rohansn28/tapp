@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tapp/utils/web.dart';
 import 'package:tapp/variables/local_variables.dart';
 import 'package:uuid/uuid.dart';
 
@@ -12,6 +13,7 @@ void initPrefs(context) async {
     deviceId = prefs.getString(deviceIdLabel)!;
     // late DateTime lastCompletion;
   } else {
+    mainTasks();
     prefs.setString(deviceIdLabel, const Uuid().v4());
     deviceId = prefs.getString(deviceIdLabel)!;
 
@@ -23,7 +25,7 @@ void initPrefs(context) async {
 
     // prefs.getKeys();
   }
-  Navigator.popAndPushNamed(context, "/login");
+  // Navigator.popAndPushNamed(context, "/login");
 }
 
 Future<int> increaseGameCoin(int value) async {
