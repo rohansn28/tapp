@@ -18,10 +18,9 @@ void main() async {
 
   // initOneSignal();
 
-  String check = await fetchButtonLinks('buttonlinks');
-  if (check != "0") {
-    runApp(const MyApp());
-  }
+  // String check = await fetchButtonLinks('buttonlinks');
+  // if (check != "0") {}
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {

@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
+
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tapp/pendingtask_screen.dart';
 import 'package:tapp/utils/web.dart';
 import 'package:tapp/variables/local_variables.dart';
 import 'package:tapp/variables/modal_variable.dart';
+
 import 'package:tapp/widgets/commonboxnew.dart';
 import 'package:tapp/widgets/commonmincoinbar.dart';
 import 'package:tapp/widgets/commontop.dart';
+import 'package:tapp/widgets/notificationmark.dart';
 
 class GameHome extends StatefulWidget {
   const GameHome({super.key});
@@ -18,16 +21,31 @@ class GameHome extends StatefulWidget {
 class _GameHomeState extends State<GameHome> {
   late SharedPreferences _prefs;
   String deviceIdK = 'N/A';
+  String uid = '';
 
   @override
   void initState() {
     super.initState();
 
-    getdeviceId();
+    // getdeviceId();
+    testFun();
+    gameHomeMainTasks();
+    testFun();
+    testFunCoin();
+    testFun();
+
     updateCoins(deviceId, gameCoins.toString());
     if (phase != 0 && gameCoins >= phase) {
-      _initializeSharedPreferences();
+      // _initializeSharedPreferences();
     }
+  }
+
+  Future<void> testFun() async {
+    var prefs = await SharedPreferences.getInstance();
+    print(prefs.getKeys());
+    // setState(() {
+    //   uid = prefs.getString('uId')!;
+    // });
   }
 
   Future<void> getdeviceId() async {
@@ -65,10 +83,10 @@ class _GameHomeState extends State<GameHome> {
                 const SizedBox(
                   height: 16,
                 ),
-                CommonMinCoinBar(
-                  text1: otherLinksModel.otherlinks![7].link,
-                  text2: otherLinksModel.otherlinks![8].link,
-                ),
+                // CommonMinCoinBar(
+                //   text1: otherLinksModel.otherlinks![7].link,
+                //   text2: otherLinksModel.otherlinks![8].link,
+                // ),
                 const SizedBox(
                   height: 16.0,
                 ),
@@ -98,10 +116,15 @@ class _GameHomeState extends State<GameHome> {
                 const Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    CommonBoxNew(
-                      text: 'NOTIFIC \n ATIONS',
-                      route: '/profile',
-                      fontSize: 25.0,
+                    Stack(
+                      children: [
+                        CommonBoxNew(
+                          text: 'NOTIFIC \n ATIONS',
+                          route: '/profile',
+                          fontSize: 25.0,
+                        ),
+                        NotificationMark(),
+                      ],
                     ),
                     CommonBoxNew(
                       text: 'PROFILE',

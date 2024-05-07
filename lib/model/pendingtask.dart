@@ -1,3 +1,7 @@
+// To parse this JSON data, do
+//
+//     final pendingTask = pendingTaskFromJson(jsonString);
+
 import 'dart:convert';
 
 List<PendingTask> pendingTaskFromJson(String str) => List<PendingTask>.from(
@@ -12,9 +16,12 @@ class PendingTask {
   String tdesc;
   String tinst;
   String image;
+  int userId;
+  String taskid;
+  String taskstatus;
+  DateTime taskcreatetime;
   DateTime createdAt;
   DateTime updatedAt;
-  String userId;
 
   PendingTask({
     required this.id,
@@ -22,9 +29,12 @@ class PendingTask {
     required this.tdesc,
     required this.tinst,
     required this.image,
+    required this.userId,
+    required this.taskid,
+    required this.taskstatus,
+    required this.taskcreatetime,
     required this.createdAt,
     required this.updatedAt,
-    required this.userId,
   });
 
   factory PendingTask.fromJson(Map<String, dynamic> json) => PendingTask(
@@ -33,9 +43,12 @@ class PendingTask {
         tdesc: json["tdesc"],
         tinst: json["tinst"],
         image: json["image"],
+        userId: json["user_id"],
+        taskid: json["taskid"],
+        taskstatus: json["taskstatus"],
+        taskcreatetime: DateTime.parse(json["taskcreatetime"]),
         createdAt: DateTime.parse(json["created_at"]),
         updatedAt: DateTime.parse(json["updated_at"]),
-        userId: json["user_id"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -44,8 +57,11 @@ class PendingTask {
         "tdesc": tdesc,
         "tinst": tinst,
         "image": image,
+        "user_id": userId,
+        "taskid": taskid,
+        "taskstatus": taskstatus,
+        "taskcreatetime": taskcreatetime.toIso8601String(),
         "created_at": createdAt.toIso8601String(),
         "updated_at": updatedAt.toIso8601String(),
-        "user_id": userId,
       };
 }

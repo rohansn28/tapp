@@ -25,7 +25,7 @@ class _CommonBoxNewState extends State<CommonBoxNew> {
   @override
   void initState() {
     super.initState();
-    _initializeSharedPreferences();
+    // _initializeSharedPreferences();
   }
 
   Future<void> _initializeSharedPreferences() async {
@@ -77,8 +77,8 @@ class _CommonBoxNewState extends State<CommonBoxNew> {
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: InkWell(
         onTap: () {
+          Navigator.pushNamed(context, widget.route);
           if (gameCoins <= phase && _canPerformTask()) {
-            Navigator.pushNamed(context, widget.route);
           } else {
             dialogbox();
           }

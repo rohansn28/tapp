@@ -1,17 +1,20 @@
 import 'dart:async';
-import 'dart:io';
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
+import 'package:readmore/readmore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:tapp/task_screen.dart';
+import 'package:tapp/taskview.dart';
 
 class commontask extends StatefulWidget {
   final String taskname;
   final String taskdesc;
   final String taskinst;
+  final int taskcoin;
+  final int taskfrequency;
 
   final String uid;
   final int index;
@@ -22,6 +25,8 @@ class commontask extends StatefulWidget {
     required this.taskname,
     required this.taskdesc,
     required this.taskinst,
+    required this.taskcoin,
+    required this.taskfrequency,
   });
 
   @override
@@ -30,58 +35,11 @@ class commontask extends StatefulWidget {
 
 class _commontaskState extends State<commontask> {
   bool isTaskCompleted = false;
-  final formkey = GlobalKey<FormState>();
-  XFile? _image;
 
-  Future<void> _pickImage(ImageSource source) async {
-    final picker = ImagePicker();
-    final pickedImage = await picker.pickImage(source: source);
-    setState(() {
-      _image = pickedImage;
-    });
-  }
-
-  Future<void> submitTask(
-    String userId,
-    String tName,
-    String tDesc,
-    String tInstruction,
-  ) async {
-    const url = 'http://10.0.2.2:8000/api/submit-task';
-
-    var request = http.MultipartRequest('POST', Uri.parse(url));
-
-    request.fields['tname'] = tName;
-    request.fields['tdesc'] = tDesc;
-    request.fields['tinst'] = tInstruction;
-    request.fields['user_id'] = userId;
-
-    if (_image != null) {
-      request.files.add(
-        await http.MultipartFile.fromPath(
-          'image',
-          _image!.path,
-        ),
-      );
-    }
-
-    try {
-      print(request.fields);
-      final streamedResponse = await request.send();
-      final response = await http.Response.fromStream(streamedResponse);
-      print(response.body);
-
-      if (response.statusCode == 200) {
-        print('ye kaam kr rha h kya?');
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-        prefs.setBool('task ${widget.index} completed', true);
-        print(response.body);
-      } else {
-        print('Failed to submit task: ${response.statusCode}');
-      }
-    } catch (e) {
-      print('Error submitting task: $e');
-    }
+  void _showMessage(String message) {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
@@ -97,98 +55,112 @@ class _commontaskState extends State<commontask> {
               decoration: const BoxDecoration(
                 color: Colors.white,
               ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Form(
-                    key: formkey,
+                  Container(
+                    // decoration: BoxDecoration(color: Colors.red),
+                    width: MediaQuery.of(context).size.width * 0.6,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        TextFormField(
-                          maxLines: null,
-                          initialValue: widget.taskname, //taskData['taskName'],
-                          decoration: InputDecoration(labelText: 'Task Name'),
-                          readOnly: true,
+                        Text(widget.taskname),
+                        SizedBox(
+                          height: 16,
                         ),
-                        TextFormField(
-                          initialValue: widget.taskdesc, //taskData['taskName'],
-                          decoration:
-                              InputDecoration(labelText: 'Task Description'),
-                          maxLines: null,
-                          readOnly: true,
-                        ),
-                        TextFormField(
-                          initialValue: widget.taskinst, //taskData['taskName'],
-                          decoration:
-                              InputDecoration(labelText: 'Task Instruction'),
-                          readOnly: true,
-                          maxLines: null,
-                        ),
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            _image == null
-                                ? Text('No image selected.')
-                                : Image.file(File(_image!.path)),
-                            ElevatedButton(
-                              onPressed: () => _pickImage(ImageSource.gallery),
-                              child: Text('Pick Image from Gallery'),
+                        ReadMoreText(
+                          widget.taskdesc,
+                          trimLength: 50,
+                          textAlign: TextAlign.start,
+                          isExpandable: false,
+                          annotations: [
+                            Annotation(
+                              regExp: RegExp(
+                                r'(?:(?:https?|ftp)://)?[\w/\-?=%.]+\.[\w/\-?=%.]+',
+                              ),
+                              spanBuilder: ({
+                                required String text,
+                                TextStyle? textStyle,
+                              }) {
+                                return TextSpan(
+                                  text: text,
+                                  style:
+                                      (textStyle ?? const TextStyle()).copyWith(
+                                    decoration: TextDecoration.underline,
+                                    color: Colors.green,
+                                  ),
+                                  recognizer: TapGestureRecognizer()
+                                    ..onTap = () => _showMessage(text),
+                                );
+                              },
                             ),
                           ],
                         ),
-                        ElevatedButton(
-                          onPressed: () async {
-                            submitTask(
-                              widget.uid,
-                              widget.taskname,
-                              widget.taskdesc,
-                              widget.taskinst,
-                            );
-
-                            showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return AlertDialog(
-                                  title: const Text(
-                                    textAlign: TextAlign.center,
-                                    'Task Submitted',
-                                  ),
-                                  content: const Text(
-                                      textAlign: TextAlign.center,
-                                      'You can perform this task again in 24 hours.'),
-                                  actions: <Widget>[
-                                    Center(
-                                      child: TextButton(
-                                        onPressed: () {
-                                          setState(() {
-                                            isTaskCompleted = true;
-                                          });
-                                          Navigator.pop(context);
-                                          Navigator.pushReplacement(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const TaskScreen(),
-                                            ),
-                                          );
-                                        },
-                                        child: const Text('OK'),
-                                      ),
-                                    ),
-                                  ],
-                                );
-                              },
-                            );
-                          },
-                          child: const Text(
-                            'Submit',
-                            style: TextStyle(color: Colors.green),
-                          ),
+                        SizedBox(
+                          height: 16,
                         ),
+                        Text(widget.taskinst),
+                        SizedBox(
+                          height: 16,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Row(
+                            children: [
+                              Text(
+                                "Coins:${widget.taskcoin.toString()}",
+                              ),
+                              SizedBox(
+                                width: 30,
+                              ),
+                              Text(
+                                "Task Frequency:${widget.taskfrequency.toString()}",
+                              )
+                            ],
+                          ),
+                        )
                       ],
                     ),
                   ),
+                  Column(
+                    children: [
+                      SizedBox(
+                        // decoration: BoxDecoration(color: Colors.green),
+                        width: MediaQuery.of(context).size.width * 0.2,
+                        child: Image.asset(
+                          'assets/images/5676758.png',
+                          width: MediaQuery.of(context).size.width * 0.1,
+                        ),
+                      ),
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => TaskViewScreen(
+                              taskname: widget.taskname,
+                              taskdesc: widget.taskdesc,
+                              taskinst: widget.taskinst,
+                              taskcoin: widget.taskcoin,
+                              taskfrequency: widget.taskfrequency,
+                              taskid: widget.index.toString(),
+                              uid: widget.uid,
+                            ),
+                          ));
+                        },
+                        style: ButtonStyle(
+                          backgroundColor:
+                              const MaterialStatePropertyAll(Colors.green),
+                          foregroundColor:
+                              const MaterialStatePropertyAll(Colors.white),
+                          shape: MaterialStatePropertyAll(
+                            RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10)),
+                          ),
+                        ),
+                        child: const Text('View'),
+                      )
+                    ],
+                  )
                 ],
               ),
             ),

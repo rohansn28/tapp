@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tapp/utils/web.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -24,6 +25,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       isloading = true;
     });
     preferences = await SharedPreferences.getInstance();
+
+    // userCoins(int.parse(preferences.getString('uId')!));
     setState(() {
       isloading = false;
     });

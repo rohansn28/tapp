@@ -18,11 +18,11 @@ class TaskScreen extends StatefulWidget {
 }
 
 class _TaskScreenState extends State<TaskScreen> {
-  late SharedPreferences prefs;
-  late String uid;
+  String uid = '';
 
   void initPrefs() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    print(prefs.getKeys());
     setState(() {
       uid = prefs.getString('uId')!;
     });
@@ -37,7 +37,7 @@ class _TaskScreenState extends State<TaskScreen> {
 
   @override
   Widget build(BuildContext context) {
-    mainTasks();
+    // newTaskData(uid);
     return Scaffold(
       appBar: AppBar(
         leading: InkWell(
@@ -74,16 +74,27 @@ class _TaskScreenState extends State<TaskScreen> {
                 const SizedBox(
                   height: 16,
                 ),
-                CommonMinCoinBar(
-                  text1: otherLinksModel.otherlinks![7].link,
-                  text2: otherLinksModel.otherlinks![8].link,
+                // CommonMinCoinBar(
+                //   text1: otherLinksModel.otherlinks![7].link,
+                //   text2: otherLinksModel.otherlinks![8].link,
+                // ),
+                const Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('Task Available: 7',
+                        style: TextStyle(color: Colors.white)),
+                    Text('Coins Available to Earn: 1500',
+                        style: TextStyle(color: Colors.white)),
+                  ],
                 ),
+                const Text('Pending Coins: 800',
+                    style: TextStyle(color: Colors.white)),
                 const SizedBox(
                   height: 20,
                 ),
                 Expanded(
                   child: FutureBuilder<List<Task>>(
-                    future: mainTasks(),
+                    future: taskData(),
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
                         return ListView.builder(
@@ -95,6 +106,8 @@ class _TaskScreenState extends State<TaskScreen> {
                               taskinst: snapshot.data![index].taskinst,
                               uid: uid,
                               index: snapshot.data![index].id,
+                              taskcoin: snapshot.data![index].tcoin,
+                              taskfrequency: snapshot.data![index].tfrequency,
                             );
                           },
                         );

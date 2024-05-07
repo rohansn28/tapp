@@ -1,6 +1,5 @@
-import 'package:flutter/material.dart';
-
 import 'package:shared_preferences/shared_preferences.dart';
+
 import 'package:tapp/utils/web.dart';
 import 'package:tapp/variables/local_variables.dart';
 import 'package:uuid/uuid.dart';
@@ -12,8 +11,10 @@ void initPrefs(context) async {
     gameCoins = prefs.getInt(gameCoinsLabel)!;
     deviceId = prefs.getString(deviceIdLabel)!;
     // late DateTime lastCompletion;
+    mainTasks();
   } else {
     mainTasks();
+
     prefs.setString(deviceIdLabel, const Uuid().v4());
     deviceId = prefs.getString(deviceIdLabel)!;
 
